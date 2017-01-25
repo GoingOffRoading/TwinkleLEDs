@@ -1,14 +1,8 @@
-# NeoPixel library strandtest example
-# Author: Tony DiCola (tony@tonydicola.com)
-#
-# Direct port of the Arduino NeoPixel library strandtest example.  Showcases
-# various animations on a strip of NeoPixels.
 import time
 import randomcolor
 
 from random import randint
 from neopixel import *
-
 
 # LED strip configuration:
 LED_COUNT      = 16      # Number of LED pixels.
@@ -18,45 +12,17 @@ LED_DMA        = 5       # DMA channel to use for generating signal (try 5)
 LED_BRIGHTNESS = 50     # Set to 0 for darkest and 255 for brightest
 LED_INVERT     = False   # True to invert the signal (when using NPN transistor level shift)
 
-# Color Thing
+# This generates an RGB color from the randomcolor plugin
 rand_color = randomcolor.RandomColor()
 
 
-# Define functions which animate LEDs in various ways.
+# This is the animation for the LED
 def colorWipe(strip, color, wait_ms=50):
 	"""Wipe color across display a pixel at a time."""
 	for i in range(strip.numPixels()):
 		strip.setPixelColor(i, color)
 		strip.show()
 		time.sleep(wait_ms/1000.0)
-
-def wheel(pos):
-	"""Generate rainbow colors across 0-255 positions."""
-	if pos < 85:
-		return Color(pos * 3, 255 - pos * 3, 0)
-	elif pos < 170:
-		pos -= 85
-		return Color(255 - pos * 3, 0, pos * 3)
-	else:
-		pos -= 170
-		return Color(0, pos * 3, 255 - pos * 3)
-
-def rainbow(strip, wait_ms=20, iterations=1):
-	"""Draw rainbow that fades across all pixels at once."""
-	for j in range(256*iterations):
-		for i in range(strip.numPixels()):
-			strip.setPixelColor(i, wheel((i+j) & 255))
-		strip.show()
-		time.sleep(wait_ms/1000.0)
-
-def rainbowCycle(strip, wait_ms=20, iterations=5):
-	"""Draw rainbow that uniformly distributes itself across all pixels."""
-	for j in range(256*iterations):
-		for i in range(strip.numPixels()):
-			strip.setPixelColor(i, wheel((int(i * 256 / strip.numPixels()) + j) & 255))
-		strip.show()
-		time.sleep(wait_ms/1000.0)
-
 
 # Main program logic follows:
 if __name__ == '__main__':
@@ -68,6 +34,23 @@ if __name__ == '__main__':
 	print ('Press Ctrl-C to quit.')
 	while True:
 		# Color wipe animations.
-		#colorWipe(strip, Color(rand_color.generate(format_='rgbArray')))
- 		rand_col = rand_color.generate(format_='rbgbArray').replace('[', '').replace(']', '')
-		colorWipe(strip, Color(rand_col))
+
+
+		#Attempt 1: no idea of what I was thinking here
+		#colorWipe(strip, Color(', '.join(map(str, rand_color.generate(format_='rgbArray')))))
+
+ 		
+		#Attempt 2: I tried messing with the .replace function, no luck
+		#rand_col = rand_color.generate(format_='rbgbArray').replace('[', '').replace(']', '')
+
+		
+		#Attempt 3: Your first idea
+		#rand_col = rand_color.generate(format_='rbgbArray')
+		#colorWipe(strip, Color(rand_col[0], rand_col[1], rand_cold[2]))
+		#with this, I get a 'list index out of range' error		
+
+
+		#Attempt 4: Your second idea
+		rand_col = rand_color.generate(format_='rgbArray')
+		colorWipe(strip, Color(*rand_col))
+		#With this, I get a type error with a message like 'requires three arguments' whch makes me think that this is failing to strip something
